@@ -1,0 +1,45 @@
+
+/* SponsorMatch V3 — UX upgrade. Keeps the original visual identity. */
+:root{--ink:#173428;--green:#216249;--line:#dce7dd;--paper:#f6f9f5;--shadow:0 16px 48px #173d2915}
+body{background:linear-gradient(155deg,#f5f9f4,#fff 45%,#f1f7ef);font-size:15px}
+.sidebar{background:linear-gradient(167deg,#123c2d,#1e5840 72%,#144331)}
+.brand{letter-spacing:-.65px}.brand .mark{box-shadow:0 8px 24px #d5f48c24}
+.workspace{max-width:1680px}.top{position:relative}
+.nav{border:1px solid transparent}.nav:focus-visible,.link:focus-visible,.btn:focus-visible{outline:3px solid #b7e379;outline-offset:3px}
+.hero{background:linear-gradient(110deg,#e9f4dc 0%,#e2efd2 60%,#d3e8bc);border:1px solid #d9e8d0;box-shadow:0 20px 50px #2a64301a}
+.stat,.card,.panel{box-shadow:0 4px 18px #173d2908}.stat,.card,.panel,.listitem{border-color:#dfe9de}
+.card:hover,.stat:hover{box-shadow:0 14px 30px #1d4f2921}
+.cardfooter{flex-wrap:wrap}.cardfooter .link{min-height:40px}
+.page-title h1{font-size:clamp(30px,3vw,42px)}
+.input:focus,select:focus,textarea:focus{outline:3px solid #bce393;outline-offset:1px;border-color:#4b9364}
+.tools{align-items:center}
+.notice{border:1px solid #c8dfc8;background:#eef8eb;color:#245b3d;border-radius:15px;padding:15px 18px;font-size:13px;margin:0 0 20px;line-height:1.55}
+.notice strong{display:block;margin-bottom:3px}.notice p{margin:0}
+.demo-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.demo-controls label{color:#607769;font-size:12px;font-weight:750}
+.demo-controls select{width:auto;max-width:175px;padding:8px 10px;border-radius:10px;border:1px solid #d8e4d8;background:white;font-size:12px}
+.action-small{background:#fff;color:#245c40;border:1px solid #d6e5d7;border-radius:10px;padding:8px 11px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+.action-small:hover{background:#e9f5e7}
+.action-small.danger{color:#963c35}
+.action-small:focus-visible{outline:3px solid #96c867}
+.demo-kicker{font-size:12px;color:#618167;margin-top:5px}
+.guide-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:16px 0 28px}
+.guide-card{border:1px solid #deeadb;background:white;border-radius:15px;padding:16px;display:flex;gap:11px;align-items:flex-start}
+.guide-card .step{height:31px;width:31px;flex:none;border-radius:10px;background:#e5f3d8;color:#245c40;display:grid;place-items:center;font-weight:900}
+.guide-card b{font-size:13px}.guide-card p{font-size:12px;color:#728374;margin:4px 0 0}
+.score-explain{display:block;font-size:11px;color:#63846b;margin:0 0 10px}
+.inline-help{font-size:12px;color:#58755e;margin-top:9px}
+.chip-demo{display:inline-flex;padding:5px 10px;border-radius:99px;background:#fff2d9;color:#815821;font-weight:800;font-size:11px}
+#mobileBackdrop{display:none}
+#upgradeHelp{margin:10px 0 22px}
+dialog#detailDialog{border:0;border-radius:20px;width:min(520px,calc(100% - 24px));padding:27px;color:#173428;box-shadow:0 30px 100px #10251659}
+dialog#detailDialog::backdrop{background:#0a2519a6;backdrop-filter:blur(3px)}
+#detailDialog h2{margin:0 0 13px}#detailDialog p,#detailDialog li{color:#506b57;font-size:13px}
+#detailDialog .row{margin-top:20px}
+#modalwrap .modal{outline:none}
+footer.upgrade-footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;border-top:1px solid #dce9de;margin-top:22px;padding-top:20px;font-size:12px;color:#6e8473}
+footer.upgrade-footer a{color:#235e42}
+@media(max-width:1200px){.demo-controls{justify-content:flex-end}.top{align-items:flex-start}.crumb{padding-top:10px}}
+@media(max-width:900px){.top{align-items:center;flex-wrap:wrap}.demo-controls{width:100%;justify-content:flex-start}.topright{display:none}.guide-cards{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){#mobileBackdrop.show{display:block;position:fixed;inset:0;background:#081d13a1;z-index:9}.sidebar{z-index:11}.workspace{padding-top:18px}.hero-copy{padding:29px 24px}.section-head{align-items:flex-start}.section-head h2{font-size:20px}}
+@media(max-width:540px){.guide-cards{grid-template-columns:1fr}.demo-controls{display:grid;grid-template-columns:1fr 1fr}.demo-controls label{grid-column:1/-1}.demo-controls select{max-width:none;grid-column:1/-1}.demo-controls .action-small{font-size:11px}.hero h1{font-size:34px;letter-spacing:-1.3px}.hero-art{min-height:185px}.stat strong{font-size:25px}.page-title h1{font-size:30px}.panel{padding:19px}.card{padding:17px}.listitem{flex-wrap:wrap}.listitem select{margin-left:auto!important}}
