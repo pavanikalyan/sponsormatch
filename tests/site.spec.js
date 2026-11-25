@@ -60,3 +60,14 @@ test('data reset restores fictional sample records', async ({page}) => {
   await page.getByRole('button',{name:'Organisations'}).click();
   await expect(page.locator('#directoryGrid')).toContainText('Sheffield Youth FC');
 });
+
+test('campaign studio generates a local copyable brief',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Campaign studio'}).click();
+  await page.locator('#campaignTitle').fill('Community Sports Day');
+  await page.locator('#campaignCommunity').fill('Test Football Club');
+  await page.locator('#campaignBrand').fill('Partner Business Ltd');
+  await page.locator('#campaignGenerate').click();
+  await expect(page.locator('#campaignOutput')).toContainText('Community Sports Day');
+  await expect(page.locator('#campaignOutput')).toContainText('REVIEW CHECKLIST');
+});
