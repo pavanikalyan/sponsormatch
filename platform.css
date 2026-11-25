@@ -49,3 +49,14 @@ dialog{border:0;border-radius:22px;padding:0;box-shadow:0 35px 110px #071c1066;m
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 [hidden]{display:none!important}
+
+/* WCAG AA contrast refinements after automated Axe audit. */
+.sub,.help,.small-label,.footer,.section-head p,.step p,.page-heading p,
+.card p,.panel p,.stat span,.explanation,.list-row p{color:#49634f}
+.eyebrow{color:#2e6a49}
+.stat em{color:#276b47}
+.badge{color:#28543a}
+.badge.demo{color:#6c471c}
+.badge.pending{color:#6c491a}
+.badge.rejected{color:#822f2a}
+input::placeholder,textarea::placeholder{color:#526b59;opacity:1}
