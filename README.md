@@ -29,6 +29,13 @@ The public role selector switches **demo views only**. When Supabase is configur
 
 The large demo banner, unconfigured backend prompt, Visitor option and Campaign Studio have been removed from the primary interface. The older V3 is still available under `legacy.html` for reference.
 
+## Standalone account pages
+
+- **Log in:** [login.html](login.html) — authenticate as a registered Club or Sponsor, then return to the home dashboard.
+- **Register:** [register.html](register.html) — create a Club or Business Sponsor account; the site returns to home with an email-confirmation notice if verification is needed.
+- **Admin:** cannot register through the public form; access is assigned manually by the database owner.
+- These forms are visible but safely disabled until Supabase is configured. Never submit passwords to the unconfigured prototype.
+
 ## Important: demo vs connected mode
 
 Out of the box, GitHub Pages runs in **Demo Mode**. Sample organisations and proposals are fictional and saved in that visitor's browser. Demo personas (Club/Sponsor/Admin) are **not** real accounts or permission enforcement.
