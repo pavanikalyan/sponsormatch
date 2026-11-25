@@ -157,7 +157,7 @@ for each row execute function public.validate_verification();
 
 create or replace function public.owns_org(_org_id uuid)
 returns boolean language sql stable security definer set search_path=''
-as $$ select exists(select 1 from public.organizations where id=_org_id and owner_id=(select auth.uid())); $;
+as $$ select exists(select 1 from public.organizations where id=_org_id and owner_id=(select auth.uid())); $$;
 create or replace function public.is_org_approved(_org_id uuid)
 returns boolean language sql stable security definer set search_path=''
 as $$ select exists(select 1 from public.org_verifications where org_id=_org_id and status='approved'); $$;
