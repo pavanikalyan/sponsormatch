@@ -102,27 +102,35 @@ test('direct URL hash does not reveal admin-only screen to Club',async({page})=>
  await expect(page.locator('#verification')).toBeHidden();
 });
 
-test('Log in button opens a safe sign-in modal',async({page})=>{
+
+test('Log in opens a dedicated page with safe backend notice',async({page})=>{
  await page.locator('#authOpen').click();
- await expect(page.locator('#authDialog')).toBeVisible();
- await expect(page.locator('#authTitle')).toHaveText('Log in to SponsorMatch');
- await expect(page.locator('#signupFields')).toBeHidden();
- await expect(page.locator('#authBackendNotice')).toBeVisible();
+ await expect(page).toHaveURL(/\/login\.html$/);
+ await expect(page.getByRole('heading',{name:'Log in to SponsorMatch'})).toBeVisible();
+ await expect(page.locator('#backendMessage')).toBeVisible();
  await expect(page.locator('#email')).toBeDisabled();
  await expect(page.locator('#password')).toBeDisabled();
- await expect(page.locator('#authSubmit')).toBeDisabled();
- await page.getByRole('button',{name:'Close'}).first().click();
- await expect(page.locator('#authDialog')).not.toBeVisible();
+ await expect(page.locator('#authPageSubmit')).toBeDisabled();
+ await page.getByRole('link',{name:'Back to home'}).click();
+ await expect(page.locator('#dashboard')).toBeVisible();
 });
-test('Register button offers only Club and Sponsor registration',async({page})=>{
+test('Register opens separate Club and Sponsor registration page',async({page})=>{
  await page.locator('#registerOpen').click();
- await expect(page.locator('#authTitle')).toHaveText('Register as Club or Sponsor');
- await expect(page.locator('#signupFields')).toBeVisible();
+ await expect(page).toHaveURL(/\/register\.html$/);
+ await expect(page.getByRole('heading',{name:'Create your account'})).toBeVisible();
  await expect(page.locator('#accountRole option')).toHaveCount(2);
  await expect(page.locator('#accountRole option[value="club"]')).toHaveCount(1);
  await expect(page.locator('#accountRole option[value="sponsor"]')).toHaveCount(1);
  await expect(page.locator('#accountRole option[value="admin"]')).toHaveCount(0);
- await expect(page.locator('#authBackendNotice')).toBeVisible();
- await page.locator('#authToggle').click();
- await expect(page.locator('#authTitle')).toContainText('Log in');
+ await expect(page.locator('#backendMessage')).toBeVisible();
+ await page.getByRole('link',{name:'Log in'}).last().click();
+ await expect(page).toHaveURL(/\/login\.html$/);
+});
+test('post-auth URLs show appropriate home notifications and clear query flags',async({page})=>{
+ await page.goto('/?auth=registered');
+ await expect(page.locator('#toast')).toContainText('Check your email');
+ await expect(page).toHaveURL(/\/#dashboard$/);
+ await page.goto('/?auth=login');
+ await expect(page.locator('#toast')).toContainText('Logged in successfully');
+ await expect(page).toHaveURL(/\/#dashboard$/);
 });

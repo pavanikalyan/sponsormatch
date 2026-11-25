@@ -31,8 +31,8 @@
   <div class="actions">
    <label class="screen-only" for="demoRole">Preview website as</label><select id="demoRole" style="width:auto;padding:7px 9px;font-size:12px"><option value="club">Club</option><option value="sponsor">Sponsor</option><option value="admin">Admin</option></select>
    <span class="badge" id="accountBadge" hidden></span>
-   <button class="btn outline small" id="authOpen" type="button">Log in</button>
-   <button class="btn small" id="registerOpen" type="button">Register</button>
+   <a class="btn outline small" id="authOpen" href="login.html">Log in</a>
+   <a class="btn small" id="registerOpen" href="register.html">Register</a>
    <button class="btn outline small" id="logout" type="button" hidden>Sign out</button>
   </div>
  </header>
@@ -87,11 +87,6 @@
  <footer class="footer"><span>SponsorMatch AI · University project · © 2026</span><span><a href="https://github.com/pavanikalyan/sponsormatch" target="_blank" rel="noopener noreferrer">GitHub source</a> · <a href="legacy.html">Original V3</a></span></footer>
 </main></div>
 
-<dialog id="authDialog" aria-labelledby="authTitle"><div class="modal-inner"><div class="modal-top"><div><span class="eyebrow">Secure accounts</span><h2 id="authTitle">Sign in</h2></div><button class="close" type="button" data-close="authDialog" aria-label="Close">×</button></div>
- <div class="notice warning" id="authBackendNotice" hidden role="status"><strong>Account registration is not active yet.</strong><p>Secure Log in and Register will work after the website owner connects Supabase. No password is collected while the backend is unconfigured. You can still explore Club, Sponsor and Admin demo views.</p></div>
- <form id="authForm"><input type="hidden" name="mode" value="login" id="authMode"><div id="signupFields" hidden><label for="displayName">Name</label><input id="displayName" name="displayName" minlength="2" maxlength="100" autocomplete="name"><label for="accountRole">I represent a</label><select id="accountRole" name="role"><option value="club">Club / VCSE organisation</option><option value="sponsor">Business sponsor</option></select></div>
- <label for="email">Email address</label><input id="email" type="email" name="email" autocomplete="email" required><label for="password">Password</label><input id="password" type="password" name="password" minlength="8" autocomplete="current-password" required>
- <p class="help">Use a strong unique password. You may need to confirm your email after registering.</p><p class="error" id="authError" role="alert"></p><div class="modal-actions"><button class="btn" type="submit" id="authSubmit">Sign in</button><button class="btn outline" type="button" id="authToggle">Create account</button></div></form></div></dialog>
 <dialog id="orgDialog" aria-labelledby="orgTitle"><div class="modal-inner"><div class="modal-top"><h2 id="orgTitle">Organisation profile</h2><button class="close" type="button" data-close="orgDialog" aria-label="Close">×</button></div>
  <form id="orgForm"><div class="field-grid"><div><label for="orgName">Organisation name</label><input id="orgName" name="name" minlength="2" maxlength="120" required></div><div><label for="orgCity">City</label><input id="orgCity" name="location" minlength="2" maxlength="100" required></div>
  <div><label for="orgCategory">Cause or sector</label><select id="orgCategory" name="category"><option>Football</option><option>Cricket</option><option>Basketball</option><option>Community</option><option>Education</option><option>Environment</option><option>Other</option></select></div>
