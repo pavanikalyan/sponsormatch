@@ -15,9 +15,17 @@ const clone=x=>JSON.parse(JSON.stringify(x));
 function loadDemo(){try{const val=JSON.parse(localStorage.getItem('sponsormatch-demo-v4'));if(val&&Array.isArray(val.orgs)&&Array.isArray(val.proposals))return val}catch{}return clone(seed)}
 const conf=window.SPONSORMATCH_CONFIG||{},configured=/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(conf.url||'')&&typeof conf.anonKey==='string'&&conf.anonKey.length>20;
 const api=configured&&window.supabase?.createClient?window.supabase.createClient(conf.url,conf.anonKey):null;
-const st={api,user:null,profile:null,isAdmin:false,persona:'visitor',page:'dashboard',db:loadDemo(),mode:'demo',editOrg:null,loading:false};
+const st={api,user:null,profile:null,isAdmin:false,persona:'club',page:'dashboard',db:loadDemo(),mode:'demo',editOrg:null,loading:false};
 const isLive=()=>st.mode==='live'&&!!st.user;
-const currentRole=()=>isLive()?(st.isAdmin?'admin':st.profile?.role||'visitor'):st.persona;
+const currentRole=()=>isLive()?(st.isAdmin?'admin':st.profile?.role||'club'):st.persona;
+const rolePages=role=>role==='admin'?['dashboard','directory','proposals','verification','help']:
+  ['dashboard','directory','matching','proposals','profile','help'];
+const mayAccess=page=>rolePages(currentRole()).includes(page);
+const roleIntro={
+ club:{eyebrow:'✦ Club / VCSE workspace',title:'Find sponsors for your community.',desc:'Manage your club, discover suitable business sponsors and review sponsorship offers.',cta:'Find business sponsors',target:'directory',guide:'Your club journey',guided:'Build a club profile, find a sponsor, and respond to offers.',featured:'Sponsors that could support you'},
+ sponsor:{eyebrow:'✦ Business sponsor workspace',title:'Support communities that matter.',desc:'Discover local clubs, compare compatible causes and submit sponsorship proposals.',cta:'Discover community clubs',target:'directory',guide:'Your sponsor journey',guided:'Set your priorities, discover clubs and send a proposal.',featured:'Community clubs to support'},
+ admin:{eyebrow:'✦ Platform management workspace',title:'Build trust in every partnership.',desc:'Review club and sponsor registrations, approve organisations and monitor the sponsorship process.',cta:'Review organisations',target:'verification',guide:'Your administration workflow',guided:'Check applications, manage approvals and oversee proposals.',featured:'Organisations awaiting a decision'}
+};
 const uid=()=>isLive()?st.user.id:'demo-'+st.persona;
 const own=o=>o.owner_id===uid(),canReview=()=>currentRole()==='admin';
 const status=o=>o.verification||'pending',approved=o=>status(o)==='approved';
@@ -28,7 +36,7 @@ const sponsors=()=>st.db.orgs.filter(o=>o.kind==='sponsor'&&(approved(o)||own(o)
 const safeNum=x=>Number.isFinite(Number(x))?Number(x):0;
 function toast(text,bad=false){const el=$('toast');el.textContent=text;el.style.background=bad?'#9d3e37':'#184b33';el.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>el.classList.remove('show'),4500)}
 function saveDemo(){if(!isLive())try{localStorage.setItem('sponsormatch-demo-v4',JSON.stringify(st.db))}catch{toast('Browser storage unavailable',true)}}
-function nav(page){if(!$(page))return;st.page=page;$$('.view').forEach(v=>v.classList.toggle('active',v.id===page));$$('#nav .nav').forEach(b=>{const active=b.dataset.page===page;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')});$('breadcrumb').textContent=({dashboard:'Dashboard',directory:'Organisations',matching:'Match explorer',proposals:'Proposals',profile:'My organisation',verification:'Verification',studio:'Campaign studio',help:'About & privacy'})[page]||page;history.replaceState(null,'','#'+page);closeMenu();renderPage();window.scrollTo({top:0,behavior:'smooth'})}
+function nav(page){if(!$(page)||!mayAccess(page))page='dashboard';st.page=page;$$('.view').forEach(v=>v.classList.toggle('active',v.id===page));$$('#nav .nav').forEach(b=>{const active=b.dataset.page===page;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')});$('breadcrumb').textContent=({dashboard:'Dashboard',directory:'Organisations',matching:'Match explorer',proposals:'Proposals',profile:'My organisation',verification:'Verification',help:'About & access'})[page]||page;history.replaceState(null,'','#'+page);closeMenu();renderPage();window.scrollTo({top:0,behavior:'smooth'})}
 function closeMenu(){$('sidebar').classList.remove('open');$('backdrop').classList.remove('show');$('menu').setAttribute('aria-expanded','false')}
 $('menu').addEventListener('click',()=>{const open=$('sidebar').classList.toggle('open');$('backdrop').classList.toggle('show',open);$('menu').setAttribute('aria-expanded',String(open))});
 $('backdrop').addEventListener('click',()=>{closeMenu();$('menu').focus()});
@@ -44,15 +52,71 @@ const budget=safeNum(sponsor.budget)>=safeNum(club.budget)?15:safeNum(sponsor.bu
 return {total:base+loc+interests+budget,base,loc,interests,budget}}
 function orgCard(o){const icon=o.kind==='club'?'🏟️':'🏢',measure=o.kind==='club'?'Funding goal':'Sponsor budget';
 return '<article class="card"><div class="card-head"><span class="round-icon" aria-hidden="true">'+icon+'</span><div><h3>'+esc(o.name)+'</h3><span class="sub">'+esc(o.category)+' · '+esc(o.location)+'</span></div></div><p>'+esc(o.description||'No description yet.')+'</p><span class="badge '+esc(status(o))+'">'+esc(status(o))+'</span><div class="foot"><div><div class="small-label">'+measure+'</div><span class="amount">'+money(o.budget)+'</span></div><span class="sub">'+(o.kind==='club'?'Community club':'Business sponsor')+'</span></div></article>'}
-function matchCard(c,s){const m=score(c,s);return '<article class="card"><div class="card-head"><div class="round-icon">🏢</div><div><h3>'+esc(s.name)+'</h3><span class="sub">'+esc(s.location)+' · '+esc(s.category)+'</span></div></div><p>For '+esc(c.name)+'</p><div style="display:flex;align-items:center;justify-content:space-between"><span class="badge">'+(m.total>=80?'Strong fit':m.total>=60?'Potential fit':'Explore further')+'</span><span class="score">'+m.total+'%</span></div><div class="track"><div style="width:'+m.total+'%"></div></div><div class="explanation"><b>Why?</b> Shared interest +'+m.interests+', location +'+m.loc+', budget +'+m.budget+', baseline '+m.base+'. <span class="sub">Illustrative, not AI prediction.</span></div><div class="foot"><span class="sub">Available '+money(s.budget)+'</span><button class="btn outline small" data-start-proposal="'+esc(c.id)+'|'+esc(s.id)+'">Create proposal</button></div></article>'}
-function renderDashboard(){const orgs=st.db.orgs,ps=st.db.proposals;const pairs=clubs().flatMap(c=>sponsors().filter(approved).map(s=>({c,s,n:score(c,s).total}))).sort((a,b)=>b.n-a.n);
-$('stats').innerHTML=[[orgs.filter(o=>o.kind==='club').length,'Clubs','In network'],[orgs.filter(o=>o.kind==='sponsor').length,'Sponsors','In network'],[ps.length,'Proposals','Recorded'],[ps.filter(p=>p.status==='accepted').length,'Accepted','Demo or connected']].map(([val,label,desc])=>'<div class="stat"><span>'+label+'</span><strong>'+val+'</strong><em>'+desc+'</em></div>').join('');
-$('featured').innerHTML=pairs.length?pairs.slice(0,3).map(x=>matchCard(x.c,x.s)).join(''):'<div class="empty">No approved partnerships yet. Add verified organisations to begin.</div>'}
-function renderDirectory(){const query=$('search').value.trim().toLowerCase(),type=$('kindFilter').value;const items=st.db.orgs.filter(o=>(approved(o)||own(o)||canReview())&&(type==='all'||o.kind===type)&&[o.name,o.category,o.location].join(' ').toLowerCase().includes(query));$('directoryGrid').innerHTML=items.length?items.map(orgCard).join(''):'<div class="empty">No organisations found for these filters.</div>'}
-function renderMatching(){const selected=$('matchClub').value;const cs=clubs();$('matchClub').innerHTML=cs.map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>').join('');$('matchClub').value=cs.some(o=>o.id===selected)?selected:cs[0]?.id||'';const c=cs.find(x=>x.id===$('matchClub').value),min=Number($('minimumScore').value);const possible=c?sponsors().filter(approved).map(s=>({s,m:score(c,s)})).filter(x=>x.m.total>=min).sort((a,b)=>b.m.total-a.m.total):[];$('matchingGrid').innerHTML=possible.length?possible.map(x=>matchCard(c,x.s)).join(''):'<div class="empty">No matching sponsors meet the selected filters.</div>'}
-function renderProposals(){const role=currentRole();$('proposalNotice').innerHTML=isLive()?'<strong>Connected workflow</strong><p>Proposals are shared securely between the sponsor and the receiving club. Database rules enforce who can act.</p>':'<strong>Demo workflow</strong><p>All proposals here are fictional and stored only in this browser. Choose Club or Sponsor from the demo perspective menu to simulate the process.</p>';
+function matchCard(c,s){const m=score(c,s);return '<article class="card"><div class="card-head"><div class="round-icon">🏢</div><div><h3>'+esc(s.name)+'</h3><span class="sub">'+esc(s.location)+' · '+esc(s.category)+'</span></div></div><p>For '+esc(c.name)+'</p><div style="display:flex;align-items:center;justify-content:space-between"><span class="badge">'+(m.total>=80?'Strong fit':m.total>=60?'Potential fit':'Explore further')+'</span><span class="score">'+m.total+'%</span></div><div class="track"><div style="width:'+m.total+'%"></div></div><div class="explanation"><b>Why?</b> Shared interest +'+m.interests+', location +'+m.loc+', budget +'+m.budget+', baseline '+m.base+'. <span class="sub">Illustrative, not a prediction.</span></div><div class="foot"><span class="sub">Available '+money(s.budget)+'</span><button class="btn outline small" data-start-proposal="'+esc(c.id)+'|'+esc(s.id)+'">Create proposal</button></div></article>'}
+function renderDashboard(){
+ const role=currentRole(), intro=roleIntro[role]||roleIntro.club;
+ $('dashboard').querySelector('.eyebrow').textContent=intro.eyebrow;
+ $('roleHeroTitle').textContent=intro.title;
+ $('roleHeroDesc').textContent=intro.desc;
+ $('roleHeroCta').textContent=intro.cta+' →';
+ $('roleHeroCta').dataset.goto=intro.target;
+ $('roleGuideTitle').textContent=intro.guide;
+ $('roleGuideDesc').textContent=intro.guided;
+ $('roleFeatureTitle').textContent=intro.featured;
+ $('roleFeatureDesc').textContent=role==='admin'?'Pending or recently registered organisations.':'Based on illustrative location, interests and funding criteria.';
+ const steps=$$('#dashboard .step');
+ const guide=role==='club'?
+   [['Complete club profile','Describe your cause, location and funding needs.'],['Discover sponsors','Review compatible businesses and their budgets.'],['Respond to offers','Accept or decline sponsorship proposals sent to you.']]:
+   role==='sponsor'?
+   [['Create business profile','Add sponsorship priorities, interests and budget.'],['Find suitable clubs','Explore community projects and compare the fit.'],['Send proposals','Draft and submit an offer; track the club’s decision.']]:
+   [['Review registrations','Check new club and business information.'],['Verify organisations','Approve or reject pending applications.'],['Oversee proposals','Monitor proposal statuses and audit-trail records.']];
+ steps.forEach((node,i)=>{node.querySelector('b').textContent=guide[i][0];node.querySelector('p').textContent=guide[i][1]});
+ const orgs=st.db.orgs,visible=st.db.proposals.filter(p=>role==='admin'||(role==='sponsor'?own(st.db.orgs.find(o=>o.id===p.sponsor_org_id)||{}):own(st.db.orgs.find(o=>o.id===p.club_org_id)||{})));
+ const cards=role==='club'?[[ownOrgs().length,'My clubs','Managed profiles'],[sponsors().filter(approved).length,'Sponsors','Available'],[visible.length,'Received offers','For my clubs'],[visible.filter(p=>p.status==='accepted').length,'Accepted','Partnerships']]:
+ role==='sponsor'?[[ownOrgs().length,'My businesses','Managed profiles'],[clubs().filter(approved).length,'Clubs','Available'],[visible.length,'Sent proposals','In pipeline'],[visible.filter(p=>p.status==='accepted').length,'Accepted','Partnerships']]:
+ [[orgs.length,'Organisations','Registered'],[orgs.filter(o=>status(o)==='pending').length,'Pending reviews','Action needed'],[orgs.filter(approved).length,'Approved','Verified'],[st.db.proposals.length,'Proposals','Platform activity']];
+ $('stats').innerHTML=cards.map(([value,label,desc])=>'<div class="stat"><span>'+esc(label)+'</span><strong>'+value+'</strong><em>'+esc(desc)+'</em></div>').join('');
+ const listed=role==='admin'?orgs.filter(o=>!approved(o)).slice(0,3).map(orgCard):
+ role==='sponsor'?clubs().filter(approved).slice(0,3).map(orgCard):
+ sponsors().filter(approved).slice(0,3).map(orgCard);
+ $('featured').innerHTML=listed.length?listed.join(''):'<div class="empty">No matching organisations here yet.</div>';
+ const goButton=document.querySelector('#dashboard .section-head .btn[data-goto]');
+ if(goButton){goButton.dataset.goto=role==='admin'?'verification':role==='club'?'directory':'matching';
+ goButton.textContent=role==='admin'?'Review applications':role==='club'?'Browse sponsors':'Explore club matches'}
+}
+function renderDirectory(){
+ const role=currentRole(),query=$('search').value.trim().toLowerCase();
+ const type=role==='club'?'sponsor':role==='sponsor'?'club':$('kindFilter').value;
+ $('kindFilter').hidden=role!=='admin';
+ $('directoryDesc').textContent=role==='club'?'Browse businesses offering sponsorship and compare budgets.':role==='sponsor'?'Discover clubs and community causes looking for support.':'View clubs and sponsors, including organisations awaiting review.';
+ $('addOrg').hidden=role==='admin';
+ $('addOrg').textContent=role==='club'?'+ Create club profile':'+ Add sponsor profile';
+ const items=st.db.orgs.filter(o=>(approved(o)||own(o)||canReview())&&(type==='all'||o.kind===type)&&[o.name,o.category,o.location].join(' ').toLowerCase().includes(query));
+ $('directoryGrid').innerHTML=items.length?items.map(orgCard).join(''):'<div class="empty">No organisations match the current search.</div>';
+}
+function renderMatching(){
+ const role=currentRole();if(role==='admin')return;
+ const current=$('matchClub').value,min=Number($('minimumScore').value);
+ const options=role==='sponsor'?ownOrgs().filter(o=>o.kind==='sponsor'):ownOrgs().filter(o=>o.kind==='club');
+ // Demo users can explore using a fictional sample when they have not registered an organisation.
+ const fallback=role==='sponsor'?sponsors().filter(approved):clubs().filter(approved);
+ const choices=options.length?options:fallback;
+ $('matchLabel').textContent=role==='sponsor'?'Your business sponsor':'Your community club';
+ $('matchingDesc').textContent=role==='sponsor'?'Compare clubs that align with your interests, city and sponsorship budget.':'Explore sponsors that align with your club category, location and funding needs.';
+ $('matchClub').innerHTML=choices.map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>').join('');
+ $('matchClub').value=choices.some(o=>o.id===current)?current:(choices[0]?.id||'');
+ const selected=choices.find(o=>o.id===$('matchClub').value);
+ if(!selected){$('matchingGrid').innerHTML='<div class="empty">Create an organisation profile to compare potential matches.</div>';return}
+ const list=role==='club'?sponsors().filter(approved).map(o=>({c:selected,s:o})):clubs().filter(approved).map(o=>({c:o,s:selected}));
+ const results=list.map(v=>({...v,m:score(v.c,v.s)})).filter(v=>v.m.total>=min).sort((a,b)=>b.m.total-a.m.total);
+ $('matchingGrid').innerHTML=results.length?results.map(({c,s,m})=>{
+ if(role==='club'){let html=matchCard(c,s);return html.replace(/<button class="btn outline small" data-start-proposal="[^"]+">Create proposal<\/button>/,'<span class="sub">Sponsor can send an offer</span>')}
+ return '<article class="card"><div class="card-head"><span class="round-icon">🏟️</span><div><h3>'+esc(c.name)+'</h3><span class="sub">'+esc(c.location)+' · '+esc(c.category)+'</span></div></div><p>'+esc(c.description||'Community club')+'</p><div class="foot"><span class="badge">'+(m.total>=80?'Strong fit':'Potential fit')+'</span><span class="score">'+m.total+'%</span></div><div class="track"><div style="width:'+m.total+'%"></div></div><div class="explanation"><b>Why this match?</b> Cause +'+m.interests+', same city +'+m.loc+', budget +'+m.budget+', baseline '+m.base+'. This is a rule-based score, not a prediction.</div><div class="foot"><span class="sub">Funding goal '+money(c.budget)+'</span><button class="btn outline small" data-start-proposal="'+esc(c.id)+'|'+esc(s.id)+'">Create proposal</button></div></article>';
+ }).join(''):'<div class="empty">No potential matches meet this threshold.</div>';
+}
+function renderProposals(){const role=currentRole();$('proposalNotice').hidden=true;$('proposalDesc').textContent=role==='admin'?'Monitor all proposal statuses, without changing club or sponsor decisions.':role==='club'?'View offers to your clubs and accept or decline submitted proposals.':'Draft sponsorship offers, submit them and see clubs’ decisions.';
 $('addProposal').disabled=role!=='sponsor';$('addProposal').title=role==='sponsor'?'Create a new proposal':'Sign in as a sponsor to create proposals';
-const ps=st.db.proposals.slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+const ps=st.db.proposals.filter(p=>role==='admin'||(role==='sponsor'?own(st.db.orgs.find(o=>o.id===p.sponsor_org_id)||{}):own(st.db.orgs.find(o=>o.id===p.club_org_id)||{}))).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
 $('proposalList').innerHTML=ps.length?ps.map(p=>{const sponsor=st.db.orgs.find(o=>o.id===p.sponsor_org_id),club=st.db.orgs.find(o=>o.id===p.club_org_id);
 const sponsorCan=role==='sponsor'&&sponsor&&own(sponsor)&&p.status==='draft',clubCan=role==='club'&&club&&own(club)&&p.status==='submitted';
 return '<div class="list-row"><span class="round-icon">▤</span><div class="grow"><b>'+esc(orgName(p.sponsor_org_id))+' → '+esc(orgName(p.club_org_id))+'</b><p>'+esc(p.message)+' · '+money(p.amount)+'</p><span class="badge '+(p.status==='accepted'?'approved':p.status==='rejected'?'rejected':p.status==='submitted'?'pending':'')+'">'+esc(p.status)+'</span></div><div class="controls">'+(sponsorCan?'<button class="btn small" data-pstatus="'+esc(p.id)+'|submitted">Submit</button>':'')+(clubCan?'<button class="btn small" data-pstatus="'+esc(p.id)+'|accepted">Accept</button><button class="btn danger small" data-pstatus="'+esc(p.id)+'|rejected">Decline</button>':'')+'</div></div>'}).join(''):'<div class="empty">No proposals yet. Sponsors can create one from this page.</div>'}
@@ -60,9 +124,23 @@ function renderProfile(){const orgs=ownOrgs(),role=currentRole();$('profileAddOr
 function renderVerifications(){if(!canReview()){$('verificationList').innerHTML='<div class="empty">Administrator access required.</div>';return}
 const pending=st.db.orgs.filter(o=>!approved(o));$('verificationList').innerHTML=pending.length?pending.map(o=>'<div class="list-row"><span class="round-icon">'+(o.kind==='club'?'🏟️':'🏢')+'</span><div class="grow"><b>'+esc(o.name)+'</b><p>'+esc(o.location)+' · '+esc(o.kind)+' · '+esc(o.description||'No description')+'</p><span class="badge '+esc(status(o))+'">'+esc(status(o))+'</span></div><div class="controls"><button class="btn small" data-verify="'+esc(o.id)+'|approved">Approve</button><button class="btn danger small" data-verify="'+esc(o.id)+'|rejected">Reject</button></div></div>').join(''):'<div class="empty">No organisations currently require review.</div>'}
 function renderPage(){if(st.page==='dashboard')renderDashboard();if(st.page==='directory')renderDirectory();if(st.page==='matching')renderMatching();if(st.page==='proposals')renderProposals();if(st.page==='profile')renderProfile();if(st.page==='verification')renderVerifications()}
-function render(){const role=currentRole();$('modeBadge').textContent=isLive()?'● Connected':'◉ Demo mode';$('modeBadge').className='badge '+(isLive()?'approved':'demo');$('demoRole').hidden=isLive();$('accountBadge').hidden=!isLive();$('accountBadge').textContent=isLive()?(st.profile?.display_name||st.user.email||'Member')+' · '+(st.isAdmin?'Admin':st.profile?.role||'Member'):'';
-$('authOpen').hidden=isLive();$('authOpen').textContent=api?'Sign in / Register':'Backend setup';$('logout').hidden=!isLive();$('adminNav').hidden=!canReview();$('modeNotice').innerHTML=isLive()?'<strong>Connected account · Server-side permissions</strong><p>Your role and proposal permissions are enforced in the database. Only approved profiles appear publicly, and personal data is still subject to the project privacy and safeguarding requirements.</p>':'<strong>Educational demo · Fictional organisations</strong><p>Actions are saved only in this browser. '+(api?'Sign in to connect to the shared database.':'To enable real accounts, a project owner must configure the optional Supabase backend.')+' This demo has no real payments or AI model.</p>';renderDashboard();renderPage();$('exportDemo').disabled=isLive();$('resetDemo').disabled=isLive();
-if(st.page==='verification'&&!canReview())nav('dashboard')}
+function render(){
+ const role=currentRole(),allowed=rolePages(role);
+ $('demoRole').hidden=isLive();
+ $('accountBadge').hidden=!isLive();
+ $('accountBadge').textContent=isLive()?(st.profile?.display_name||st.user.email||'Member')+' · '+(st.isAdmin?'Admin':st.profile?.role||'Member'):'';
+ $('authOpen').hidden=isLive()||!api;
+ $('authOpen').textContent='Sign in / Register';
+ $('logout').hidden=!isLive();
+ $$('#nav .nav').forEach(b=>{b.hidden=!allowed.includes(b.dataset.page)});
+ $('exportDemo').disabled=isLive();$('resetDemo').disabled=isLive();
+ if(!allowed.includes(st.page))st.page='dashboard';
+ // Dashboard and other components reflect the active role; hidden sections are inaccessible via navigation.
+ renderDashboard();renderPage();
+ $$('.view').forEach(v=>v.classList.toggle('active',v.id===st.page));
+ $$('#nav .nav').forEach(b=>{const active=b.dataset.page===st.page;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')});
+ $('breadcrumb').textContent=({dashboard:'Dashboard',directory:'Organisations',matching:'Match explorer',proposals:'Proposals',profile:'My organisation',verification:'Verification',help:'About & access'})[st.page]||'Dashboard';
+}
 async function refresh(){if(!api)return;try{st.loading=true;const {data:{session},error:sessionError}=await api.auth.getSession();if(sessionError)throw sessionError;const user=session?.user||null;st.user=user;if(!user){st.mode='demo';st.profile=null;st.isAdmin=false;st.db=loadDemo();render();return}
 const [pr,ad,og,vr,pp]=await Promise.all([
 api.from('profiles').select('id,display_name,role').eq('id',user.id).single(),
@@ -81,8 +159,8 @@ try{let result;if(data.mode==='signup'){if(String(data.displayName||'').trim().l
 else result=await api.auth.signInWithPassword({email:data.email,password:data.password});
 if(result.error)throw result.error;$('authDialog').close();e.target.reset();if(data.mode==='signup'&&!result.data.session)toast('Account created. Check your email to confirm registration.');else{toast('Signed in');await refresh()}
 }catch(err){$('authError').textContent=err.message||'Could not authenticate'}finally{$('authSubmit').disabled=false}});
-$('logout').addEventListener('click',async()=>{if(!api)return;const r=await api.auth.signOut();if(r.error)toast(r.error.message,true);else{st.user=null;st.mode='demo';st.persona='visitor';$('demoRole').value='visitor';st.db=loadDemo();nav('dashboard');render();toast('Signed out')}});
-$('demoRole').addEventListener('change',e=>{st.persona=e.target.value;render();toast('Demo perspective: '+st.persona)});
+$('logout').addEventListener('click',async()=>{if(!api)return;const r=await api.auth.signOut();if(r.error)toast(r.error.message,true);else{st.user=null;st.mode='demo';st.persona='club';$('demoRole').value='club';st.db=loadDemo();nav('dashboard');render();toast('Signed out')}});
+$('demoRole').addEventListener('change',e=>{st.persona=e.target.value;render();nav('dashboard')});
 $('search').addEventListener('input',renderDirectory);$('kindFilter').addEventListener('change',renderDirectory);$('matchClub').addEventListener('change',renderMatching);$('minimumScore').addEventListener('change',renderMatching);
 function openOrg(o=null){const role=currentRole();if(!['club','sponsor'].includes(role)){toast('Choose a Club or Sponsor account to manage an organisation',true);return}
 st.editOrg=o?.id||null;$('orgTitle').textContent=o?'Edit organisation':'Create '+(role==='club'?'club':'business')+' profile';$('orgForm').reset();$('orgError').textContent='';for(const key of ['name','location','category','budget','description'])$('orgForm').elements.namedItem(key).value=o?.[key]??(key==='budget'?0:key==='category'?'Football':'');$('orgInterests').value=Array.isArray(o?.interests)?o.interests.join(', '):'';showDialog('orgDialog')}
@@ -126,45 +204,8 @@ $('exportDemo').addEventListener('click',()=>{if(isLive()){toast('Export is only
 const blob=new Blob([JSON.stringify({format:'sponsormatch-demo-v4',exportedAt:new Date().toISOString(),data:st.db},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='sponsormatch-demo.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Demo records exported')});
 $('resetDemo').addEventListener('click',()=>{if(isLive())return;if(!confirm('Reset this device to the fictional sample records?'))return;st.db=clone(seed);saveDemo();render();toast('Demo reset')});
 
-let lastCampaignBrief='';
-$('campaignGenerate').addEventListener('click',()=>{
- const title=$('campaignTitle').value.trim(),club=$('campaignCommunity').value.trim(),sponsor=$('campaignBrand').value.trim(),context=$('campaignContext').value.trim();
- if([title,club,sponsor].some(v=>v.length<2)){toast('Add the campaign, community and sponsor names to generate a brief.',true);return}
- const goal=$('campaignGoal').value;
- lastCampaignBrief=[
- 'CAMPAIGN BRIEF — '+title,
- '',
- 'COMMUNITY PARTNER: '+club,
- 'BUSINESS SPONSOR: '+sponsor,
- 'PRIMARY GOAL: '+goal,
- '',
- 'CONCEPT',
- 'Celebrate the partnership between '+club+' and '+sponsor+' by highlighting genuine local community value.',
- '',
- 'RECOMMENDED CONTENT',
- '1. Share a joint partnership announcement with both organisations.',
- '2. Show the community need and explain the contribution without exaggerated claims.',
- '3. Capture authentic photos or videos only with appropriate consent.',
- '4. Publish follow-up updates with measured outcomes.',
- '',
- 'SUCCESS METRICS',
- 'Track relevant participation, event attendance, community engagement and sponsor visibility.',
- '',
- 'ADDITIONAL CONTEXT',
- context||'No additional context provided.',
- '',
- 'REVIEW CHECKLIST',
- 'Confirm sponsor permission, privacy and photography consent; verify every factual claim before publication.'
- ].join('\n');
- $('campaignOutput').textContent=lastCampaignBrief;toast('Campaign brief created locally');
-});
-$('campaignCopy').addEventListener('click',async()=>{if(!lastCampaignBrief){toast('Generate a brief first',true);return}
-try{await navigator.clipboard.writeText(lastCampaignBrief);toast('Brief copied')}
-catch{toast('Clipboard unavailable. Select and copy the preview text.',true)}});
-$('campaignDownload').addEventListener('click',()=>{if(!lastCampaignBrief){toast('Generate a brief first',true);return}
-const url=URL.createObjectURL(new Blob([lastCampaignBrief],{type:'text/plain'})),a=document.createElement('a');a.href=url;a.download='sponsormatch-campaign-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Campaign brief downloaded')});
 async function init(){if(api){api.auth.onAuthStateChange(()=>setTimeout(refresh,0));await refresh()}else{st.mode='demo';render()}
-const hash=location.hash.slice(1);nav(['dashboard','directory','matching','proposals','profile','verification','studio','help'].includes(hash)?hash:'dashboard');
-if(!api){$('authOpen').title='Configure Supabase using README.md to enable secure accounts'}}
+const hash=location.hash.slice(1);nav(['dashboard','directory','matching','proposals','profile','verification','help'].includes(hash)?hash:'dashboard');
+if(!api){$('authOpen').hidden=true}}
 init();
 })();

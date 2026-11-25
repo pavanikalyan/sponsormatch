@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-for(const section of ['dashboard','directory','matching','proposals','studio','help']){
+for(const section of ['dashboard','directory','matching','proposals','help']){
   test('WCAG AA audit: '+section,async({page})=>{
     await page.goto('/');
     if(section!=='dashboard')await page.locator('#nav [data-page="'+section+'"]').click();
