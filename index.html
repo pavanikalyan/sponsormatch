@@ -1,107 +1,14 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#154632">
-<meta name="description" content="SponsorMatch AI helps community clubs and businesses discover suitable sponsorship partnerships. University demonstration.">
-<title>SponsorMatch AI — Community Sponsorship Platform</title>
-<link rel="stylesheet" href="platform.css">
-</head>
-<body>
-<a href="#content" class="skip">Skip to main content</a>
-<div class="backdrop" id="backdrop"></div>
-<div class="app">
-<aside class="sidebar" id="sidebar" aria-label="Primary navigation">
- <a href="#dashboard" class="brand"><span class="mark" aria-hidden="true">✳</span><span>SponsorMatch <span style="color:#d7eead">AI</span></span></a>
- <div class="navtag">Workspace</div>
- <nav aria-label="Main sections" id="nav">
-  <button class="nav active" data-page="dashboard"><i aria-hidden="true">◫</i> Dashboard</button>
-  <button class="nav" data-page="directory"><i aria-hidden="true">⌕</i> Organisations</button>
-  <button class="nav" data-page="matching"><i aria-hidden="true">✧</i> Match explorer</button>
-  <button class="nav" data-page="proposals"><i aria-hidden="true">▤</i> Proposals</button>
-  <button class="nav" data-page="profile"><i aria-hidden="true">♙</i> My organisation</button>
-  <button class="nav" data-page="verification" id="adminNav" hidden><i aria-hidden="true">✓</i> Verification</button>
-  <button class="nav" data-page="help"><i aria-hidden="true">ⓘ</i> About &amp; access</button>
- </nav>
- <div class="sidebar-foot"><b>Better connections. Stronger communities.</b>Discover compatible causes, send meaningful proposals and track progress in one place.</div>
-</aside>
-<main class="main" id="content" tabindex="-1">
- <header class="topbar">
-  <div style="display:flex;align-items:center;gap:11px"><button class="menu" id="menu" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">☰</button><span class="crumb" id="breadcrumb">Dashboard</span></div>
-  <div class="actions">
-   <label class="screen-only" for="demoRole">Preview website as</label><select id="demoRole" style="width:auto;padding:7px 9px;font-size:12px"><option value="club">Club</option><option value="sponsor">Sponsor</option><option value="admin">Admin</option></select>
-   <span class="badge" id="accountBadge" hidden></span>
-   <a class="btn outline small" id="authOpen" href="login.html">Log in</a>
-   <a class="btn small" id="registerOpen" href="register.html">Register</a>
-   <button class="btn outline small" id="logout" type="button" hidden>Sign out</button>
-  </div>
- </header>
- <section id="dashboard" class="view active">
-  <div class="hero"><div class="hero-copy"><span class="eyebrow">✦ Club workspace</span><h1 id="roleHeroTitle">Find sponsors for your community<span style="color:#558b59">.</span></h1><p id="roleHeroDesc">Build your club profile, discover suitable sponsors and review incoming offers.</p><button class="btn" id="roleHeroCta" data-goto="matching">Explore matches →</button></div>
-  <div class="hero-art" aria-hidden="true"><div class="orbit one">🏟️ Community clubs</div><div class="orbit two">🏢 Business sponsors</div><div class="orbit three">✦ Shared purpose</div><span class="center">↗</span></div></div>
-
-  <div class="stats" id="stats"></div>
-  <div class="section-head"><div><h2 id="roleGuideTitle">Your club journey</h2><p id="roleGuideDesc">Build your profile, compare partners and respond to offers.</p></div></div>
-  <div class="steps"><div class="step"><span class="number">01</span><div><b>Build a trusted profile</b><p>Clubs describe their needs; sponsors describe their interests and budget.</p></div></div>
-  <div class="step"><span class="number">02</span><div><b>Discover compatible partners</b><p>See transparent matching criteria—not unexplained AI percentages.</p></div></div>
-  <div class="step"><span class="number">03</span><div><b>Propose and respond</b><p>A sponsor can submit a proposal and the club can accept or decline it.</p></div></div></div>
-  <div class="section-head"><div><h2 id="roleFeatureTitle">Potential partnerships</h2><p id="roleFeatureDesc">Calculated from public profiles and sample preferences.</p></div><button class="btn outline small" data-goto="matching">View matches</button></div><div class="grid" id="featured"></div>
- </section>
- <section id="directory" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Community directory</span><h1>Discover organisations</h1><p id="directoryDesc">Browse local business sponsors supporting community causes.</p></div><button class="btn" id="addOrg" type="button">+ Add organisation</button></div>
-  <div class="filters"><label class="screen-only" for="search">Search organisations</label><input type="search" id="search" placeholder="Search names, cities, categories…"><label class="screen-only" for="kindFilter">Organisation type</label><select id="kindFilter"><option value="all">All organisations</option><option value="club">Clubs / VCSE</option><option value="sponsor">Business sponsors</option></select></div>
-  <div class="grid" id="directoryGrid"></div>
- </section>
- <section id="matching" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Explainable discovery</span><h1>Match explorer</h1><p id="matchingDesc">Compare potential sponsors using clear and explainable matching criteria.</p></div></div>
-  <div class="panel" style="margin-bottom:20px"><div class="field-grid">
-   <div><label for="matchClub" id="matchLabel">Select a club</label><select id="matchClub"></select></div>
-   <div><label for="minimumScore">Minimum compatibility</label><select id="minimumScore"><option value="0">All matches</option><option value="60">60% or more</option><option value="80">80% or more</option></select></div></div>
-   <p class="help">This score is a transparent heuristic: 40 base + 25 shared interest + 20 same location + up to 15 for compatible funding. It does not predict partnership success and is not a trained AI model.</p>
-  </div><div class="grid" id="matchingGrid"></div>
- </section>
- <section id="proposals" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Sponsorship pipeline</span><h1>Proposals</h1><p id="proposalDesc">Review sponsorship proposals sent to your club.</p></div><button class="btn" id="addProposal" type="button">+ New proposal</button></div>
-  <div class="notice" id="proposalNotice"></div><div class="panel" id="proposalList"></div>
- </section>
- <section id="profile" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Organisation profile</span><h1>My organisation</h1><p id="profileDesc">Manage your club profile and funding requirements.</p></div></div>
-  <div class="split"><div class="panel" id="myOrg"></div><div class="panel"><h3>Verification and trust</h3><p>New organisations begin as <b>Pending</b>. Only an administrator can approve them for public discovery and live proposal submission.</p><p>Approval is not a guarantee of sponsorship quality or funding. Protect personal details and verify offers independently.</p><button class="btn outline" id="profileAddOrg">Create organisation</button></div></div>
- </section>
- <section id="verification" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Administrator control</span><h1>Organisation verification</h1><p>Review club and sponsor applications, check verification details and record decisions.</p></div></div>
-  <div class="notice warning"><strong>Restricted role</strong><p>Real administrator privileges are assigned manually in the database, never through public sign-up. In demo mode, this screen is only a simulation.</p></div>
-  <div class="panel" id="verificationList"></div>
- </section>
- <section id="help" class="view">
-  <div class="page-heading"><div><span class="eyebrow">How access works</span><h1>Who can access what?</h1><p>Three clearly separated workspaces with role-based permissions.</p></div></div>
-  <div class="grid role-access"><div class="card"><div class="round-icon">🏟️</div><h3>Club / VCSE</h3><p>Manage club profile, browse sponsors, compare matching opportunities and accept or decline proposals received.</p></div><div class="card"><div class="round-icon">🏢</div><h3>Business sponsor</h3><p>Manage business profile, browse community clubs, find suitable causes, create and submit sponsorship proposals.</p></div><div class="card"><div class="round-icon">🛡️</div><h3>Administrator</h3><p>Review organisation approvals, oversee listed organisations and monitor proposals. Admin role is granted by the database owner.</p></div></div>
-  <div class="grid">
-   <div class="card"><div class="round-icon">🔎</div><h3>Explainable matching</h3><p>Scores are based on location, interests and budget. They are illustrative, not predictions or trained AI results.</p></div>
-   <div class="card"><div class="round-icon">🔒</div><h3>Security by design</h3><p>Connected accounts use Supabase authentication and database row-level security. Demo roles are simulated.</p></div>
-   <div class="card"><div class="round-icon">🧩</div><h3>University prototype</h3><p>No payment processing or real funding transfers. Organisation checks are an administrator review workflow, not legal identity certification.</p></div>
-  </div>
-  <div class="section-head"><div><h2>Data controls</h2><p>Only demo data is stored locally; connected account data is stored in the configured database.</p></div></div>
-  <div class="panel"><p>In Demo Mode you can export your browser-local sample records or reset them to the original examples. In Connected Mode, signing out does not delete your account or database records.</p><div style="display:flex;gap:9px;flex-wrap:wrap"><button class="btn outline" type="button" id="exportDemo">Export demo data</button><button class="btn danger" type="button" id="resetDemo">Reset demo</button><a class="btn outline" href="legacy.html">Open original V3</a></div><p class="help">Do not use the prototype for confidential information. Before collecting real data, prepare privacy notices, a retention schedule, safeguarding and operational incident-response processes.</p></div>
- </section>
- <footer class="footer"><span>SponsorMatch AI · University project · © 2026</span><span><a href="https://github.com/pavanikalyan/sponsormatch" target="_blank" rel="noopener noreferrer">GitHub source</a> · <a href="legacy.html">Original V3</a></span></footer>
-</main></div>
-
-<dialog id="orgDialog" aria-labelledby="orgTitle"><div class="modal-inner"><div class="modal-top"><h2 id="orgTitle">Organisation profile</h2><button class="close" type="button" data-close="orgDialog" aria-label="Close">×</button></div>
- <form id="orgForm"><div class="field-grid"><div><label for="orgName">Organisation name</label><input id="orgName" name="name" minlength="2" maxlength="120" required></div><div><label for="orgCity">City</label><input id="orgCity" name="location" minlength="2" maxlength="100" required></div>
- <div><label for="orgCategory">Cause or sector</label><select id="orgCategory" name="category"><option>Football</option><option>Cricket</option><option>Basketball</option><option>Community</option><option>Education</option><option>Environment</option><option>Other</option></select></div>
- <div><label for="orgBudget">Funding required / available (£)</label><input id="orgBudget" name="budget" type="number" min="0" max="100000000" step=".01" required></div>
- <div class="wide"><label for="orgInterests">Sponsor interests (comma-separated)</label><input id="orgInterests" name="interests" maxlength="300" placeholder="e.g. Football, Education, Community"></div>
- <div class="wide"><label for="orgDescription">Description</label><textarea id="orgDescription" name="description" maxlength="1200" placeholder="Briefly describe the organisation and goals"></textarea></div></div>
- <p class="help">A club describes its funding need; a business sponsor enters its available sponsorship budget. New organisations require review for Connected Mode visibility.</p>
- <p class="error" id="orgError" role="alert"></p><div class="modal-actions"><button class="btn" type="submit">Save organisation</button></div></form></div></dialog>
-<dialog id="proposalDialog" aria-labelledby="proposalTitle"><div class="modal-inner"><div class="modal-top"><h2 id="proposalTitle">Create sponsorship proposal</h2><button class="close" type="button" data-close="proposalDialog" aria-label="Close">×</button></div>
- <form id="proposalForm"><label for="proposalSponsor">Your sponsor organisation</label><select id="proposalSponsor" name="sponsor_org_id" required></select><label for="proposalClub">Community club</label><select id="proposalClub" name="club_org_id" required></select>
- <label for="proposalAmount">Proposed funding (£)</label><input id="proposalAmount" name="amount" type="number" min="1" max="100000000" step=".01" required>
- <label for="proposalMessage">Proposal message</label><textarea id="proposalMessage" name="message" minlength="5" maxlength="2000" required placeholder="Describe the sponsorship offer, terms and community benefits"></textarea><p class="help">Save a draft or submit to the club. Both organisations need approval before submission in Connected Mode.</p>
- <p class="error" id="proposalError" role="alert"></p><div class="modal-actions"><button class="btn outline" type="submit" name="intent" value="draft">Save draft</button><button class="btn" type="submit" name="intent" value="submitted">Submit proposal</button></div></form></div></dialog>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="supabase-config.js" defer></script>
-<script src="platform.js" defer></script>
-</body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#154632"><title>SponsorMatch AI — Register</title>
+<meta name="description" content="Register a Club or Business Sponsor account on SponsorMatch AI">
+<link rel="canonical" href="https://pavanikalyan.github.io/sponsormatch/register.html">
+<script>
+(function(){
+  var search=new URLSearchParams(window.location.search);
+  var destination=search.has('auth')?'home.html'+window.location.search+window.location.hash:'register.html';
+  window.location.replace(destination);
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=register.html"></noscript>
+</head><body><p>Opening SponsorMatch AI registration… <a href="register.html">Continue to Register</a>.</p></body></html>
