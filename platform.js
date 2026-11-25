@@ -129,8 +129,8 @@ function render(){
  $('demoRole').hidden=isLive();
  $('accountBadge').hidden=!isLive();
  $('accountBadge').textContent=isLive()?(st.profile?.display_name||st.user.email||'Member')+' · '+(st.isAdmin?'Admin':st.profile?.role||'Member'):'';
- $('authOpen').hidden=isLive()||!api;
- $('authOpen').textContent='Sign in / Register';
+ $('authOpen').hidden=isLive();
+ $('registerOpen').hidden=isLive();
  $('logout').hidden=!isLive();
  $$('#nav .nav').forEach(b=>{b.hidden=!allowed.includes(b.dataset.page)});
  $('exportDemo').disabled=isLive();$('resetDemo').disabled=isLive();
@@ -152,8 +152,30 @@ api.from('proposals').select('id,sponsor_org_id,club_org_id,sender_id,amount,mes
 st.profile=pr.data;st.isAdmin=ad.data===true;const statuses=Object.fromEntries((vr.data||[]).map(v=>[v.org_id,v.status]));
 st.db={orgs:(og.data||[]).map(o=>({...o,verification:statuses[o.id]||'pending'})),proposals:pp.data||[]};st.mode='live';render();
 }catch(e){toast('Connected data could not load: '+(e.message||e),true)}finally{st.loading=false}}
-$('authOpen').addEventListener('click',()=>{if(!api){toast('Backend not configured. Follow the README setup instructions to enable secure accounts.',true);nav('help');return}$('authError').textContent='';showDialog('authDialog')});
-$('authToggle').addEventListener('click',()=>{const sign=$('authMode').value==='login';$('authMode').value=sign?'signup':'login';$('signupFields').hidden=!sign;$('displayName').required=sign;$('authTitle').textContent=sign?'Create an account':'Sign in';$('authSubmit').textContent=sign?'Register':'Sign in';$('authToggle').textContent=sign?'I already have an account':'Create account';$('password').autocomplete=sign?'new-password':'current-password';$('authError').textContent=''});
+function selectAuthMode(mode){
+ const signup=mode==='signup';
+ $('authMode').value=signup?'signup':'login';
+ $('signupFields').hidden=!signup;
+ $('displayName').required=signup;
+ $('authTitle').textContent=signup?'Register as Club or Sponsor':'Log in to SponsorMatch';
+ $('authSubmit').textContent=signup?'Create account':'Log in';
+ $('authToggle').textContent=signup?'Already registered? Log in':'New to SponsorMatch? Register';
+ $('password').autocomplete=signup?'new-password':'current-password';
+ $('authError').textContent='';
+ const unavailable=!api;
+ $('authBackendNotice').hidden=!unavailable;
+ $('authForm').querySelectorAll('input:not([type=hidden]),select').forEach(field=>field.disabled=unavailable);
+ $('authSubmit').disabled=unavailable;
+ $('email').placeholder=signup?'you@example.com':'Your account email';
+}
+function openAuth(mode){
+ $('authForm').reset();
+ selectAuthMode(mode);
+ showDialog('authDialog');
+}
+$('authOpen').addEventListener('click',()=>openAuth('login'));
+$('registerOpen').addEventListener('click',()=>openAuth('signup'));
+$('authToggle').addEventListener('click',()=>selectAuthMode($('authMode').value==='login'?'signup':'login'));
 $('authForm').addEventListener('submit',async e=>{e.preventDefault();if(!api)return;const data=Object.fromEntries(new FormData(e.target).entries());$('authError').textContent='';$('authSubmit').disabled=true;
 try{let result;if(data.mode==='signup'){if(String(data.displayName||'').trim().length<2)throw Error('Enter your name');result=await api.auth.signUp({email:data.email,password:data.password,options:{emailRedirectTo:location.origin+location.pathname,data:{role:data.role,display_name:data.displayName.trim()}}})}
 else result=await api.auth.signInWithPassword({email:data.email,password:data.password});
@@ -206,6 +228,6 @@ $('resetDemo').addEventListener('click',()=>{if(isLive())return;if(!confirm('Res
 
 async function init(){if(api){api.auth.onAuthStateChange(()=>setTimeout(refresh,0));await refresh()}else{st.mode='demo';render()}
 const hash=location.hash.slice(1);nav(['dashboard','directory','matching','proposals','profile','verification','help'].includes(hash)?hash:'dashboard');
-if(!api){$('authOpen').hidden=true}}
+}
 init();
 })();

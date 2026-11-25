@@ -8,7 +8,8 @@ test.beforeEach(async({page})=>{
 test('default Club view has only club actions and no removed elements',async({page})=>{
  await expect(page.locator('#demoRole')).toHaveValue('club');
  await expect(page.locator('#demoRole option[value="visitor"]')).toHaveCount(0);
- await expect(page.locator('#authOpen')).toBeHidden();
+ await expect(page.locator('#authOpen')).toBeVisible();
+ await expect(page.locator('#registerOpen')).toBeVisible();
  await expect(page.locator('#modeNotice')).toHaveCount(0);
  await expect(page.locator('#studio')).toHaveCount(0);
  await expect(page.locator('#nav [data-page="verification"]')).toBeHidden();
@@ -99,4 +100,29 @@ test('direct URL hash does not reveal admin-only screen to Club',async({page})=>
  await page.goto('/#verification');
  await expect(page.locator('#dashboard')).toBeVisible();
  await expect(page.locator('#verification')).toBeHidden();
+});
+
+test('Log in button opens a safe sign-in modal',async({page})=>{
+ await page.locator('#authOpen').click();
+ await expect(page.locator('#authDialog')).toBeVisible();
+ await expect(page.locator('#authTitle')).toHaveText('Log in to SponsorMatch');
+ await expect(page.locator('#signupFields')).toBeHidden();
+ await expect(page.locator('#authBackendNotice')).toBeVisible();
+ await expect(page.locator('#email')).toBeDisabled();
+ await expect(page.locator('#password')).toBeDisabled();
+ await expect(page.locator('#authSubmit')).toBeDisabled();
+ await page.getByRole('button',{name:'Close'}).first().click();
+ await expect(page.locator('#authDialog')).not.toBeVisible();
+});
+test('Register button offers only Club and Sponsor registration',async({page})=>{
+ await page.locator('#registerOpen').click();
+ await expect(page.locator('#authTitle')).toHaveText('Register as Club or Sponsor');
+ await expect(page.locator('#signupFields')).toBeVisible();
+ await expect(page.locator('#accountRole option')).toHaveCount(2);
+ await expect(page.locator('#accountRole option[value="club"]')).toHaveCount(1);
+ await expect(page.locator('#accountRole option[value="sponsor"]')).toHaveCount(1);
+ await expect(page.locator('#accountRole option[value="admin"]')).toHaveCount(0);
+ await expect(page.locator('#authBackendNotice')).toBeVisible();
+ await page.locator('#authToggle').click();
+ await expect(page.locator('#authTitle')).toContainText('Log in');
 });
