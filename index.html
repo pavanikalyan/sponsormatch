@@ -21,8 +21,7 @@
   <button class="nav" data-page="proposals"><i aria-hidden="true">▤</i> Proposals</button>
   <button class="nav" data-page="profile"><i aria-hidden="true">♙</i> My organisation</button>
   <button class="nav" data-page="verification" id="adminNav" hidden><i aria-hidden="true">✓</i> Verification</button>
-  <button class="nav" data-page="studio"><i aria-hidden="true">✦</i> Campaign studio</button>
-  <button class="nav" data-page="help"><i aria-hidden="true">ⓘ</i> About &amp; privacy</button>
+  <button class="nav" data-page="help"><i aria-hidden="true">ⓘ</i> About &amp; access</button>
  </nav>
  <div class="sidebar-foot"><b>Better connections. Stronger communities.</b>Discover compatible causes, send meaningful proposals and track progress in one place.</div>
 </aside>
@@ -30,69 +29,52 @@
  <header class="topbar">
   <div style="display:flex;align-items:center;gap:11px"><button class="menu" id="menu" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">☰</button><span class="crumb" id="breadcrumb">Dashboard</span></div>
   <div class="actions">
-   <span class="badge demo" id="modeBadge">◉ Demo mode</span>
-   <label class="screen-only" for="demoRole">Demo perspective</label><select id="demoRole" style="width:auto;padding:7px 9px;font-size:12px"><option value="visitor">Visitor</option><option value="club">Club</option><option value="sponsor">Sponsor</option><option value="admin">Admin demonstration</option></select>
+   <label class="screen-only" for="demoRole">Preview website as</label><select id="demoRole" style="width:auto;padding:7px 9px;font-size:12px"><option value="club">Club</option><option value="sponsor">Sponsor</option><option value="admin">Admin</option></select>
    <span class="badge" id="accountBadge" hidden></span>
-   <button class="btn outline small" id="authOpen" type="button">Sign in</button>
+   <button class="btn outline small" id="authOpen" type="button" hidden>Sign in</button>
    <button class="btn outline small" id="logout" type="button" hidden>Sign out</button>
   </div>
  </header>
  <section id="dashboard" class="view active">
-  <div class="hero"><div class="hero-copy"><span class="eyebrow">✦ Community sponsorship, made clearer</span><h1>Good partnerships start here<span style="color:#558b59">.</span></h1><p>Connect community organisations with businesses that share their goals. Explore opportunities, explain matches and create sponsorship proposals.</p><button class="btn" data-goto="matching">Explore matches →</button></div>
+  <div class="hero"><div class="hero-copy"><span class="eyebrow">✦ Club workspace</span><h1 id="roleHeroTitle">Find sponsors for your community<span style="color:#558b59">.</span></h1><p id="roleHeroDesc">Build your club profile, discover suitable sponsors and review incoming offers.</p><button class="btn" id="roleHeroCta" data-goto="matching">Explore matches →</button></div>
   <div class="hero-art" aria-hidden="true"><div class="orbit one">🏟️ Community clubs</div><div class="orbit two">🏢 Business sponsors</div><div class="orbit three">✦ Shared purpose</div><span class="center">↗</span></div></div>
-  <div class="notice warning" id="modeNotice" role="note"><strong>Educational demo · Sample organisations</strong><p>Data is stored only in your browser. This is not a live sponsorship service. Please do not enter real personal or financial information.</p></div>
+
   <div class="stats" id="stats"></div>
-  <div class="section-head"><div><h2>How the platform works</h2><p>Two clear journeys from discovery to sponsorship.</p></div></div>
+  <div class="section-head"><div><h2 id="roleGuideTitle">Your club journey</h2><p id="roleGuideDesc">Build your profile, compare partners and respond to offers.</p></div></div>
   <div class="steps"><div class="step"><span class="number">01</span><div><b>Build a trusted profile</b><p>Clubs describe their needs; sponsors describe their interests and budget.</p></div></div>
   <div class="step"><span class="number">02</span><div><b>Discover compatible partners</b><p>See transparent matching criteria—not unexplained AI percentages.</p></div></div>
   <div class="step"><span class="number">03</span><div><b>Propose and respond</b><p>A sponsor can submit a proposal and the club can accept or decline it.</p></div></div></div>
-  <div class="section-head"><div><h2>Potential partnerships</h2><p>Calculated from public profiles and sample preferences.</p></div><button class="btn outline small" data-goto="matching">View matches</button></div><div class="grid" id="featured"></div>
+  <div class="section-head"><div><h2 id="roleFeatureTitle">Potential partnerships</h2><p id="roleFeatureDesc">Calculated from public profiles and sample preferences.</p></div><button class="btn outline small" data-goto="matching">View matches</button></div><div class="grid" id="featured"></div>
  </section>
  <section id="directory" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Community directory</span><h1>Discover organisations</h1><p>Browse community clubs and local business sponsors.</p></div><button class="btn" id="addOrg" type="button">+ Add organisation</button></div>
+  <div class="page-heading"><div><span class="eyebrow">Community directory</span><h1>Discover organisations</h1><p id="directoryDesc">Browse local business sponsors supporting community causes.</p></div><button class="btn" id="addOrg" type="button">+ Add organisation</button></div>
   <div class="filters"><label class="screen-only" for="search">Search organisations</label><input type="search" id="search" placeholder="Search names, cities, categories…"><label class="screen-only" for="kindFilter">Organisation type</label><select id="kindFilter"><option value="all">All organisations</option><option value="club">Clubs / VCSE</option><option value="sponsor">Business sponsors</option></select></div>
   <div class="grid" id="directoryGrid"></div>
  </section>
  <section id="matching" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Explainable discovery</span><h1>Match explorer</h1><p>Compare location, cause and sponsorship budget using an explicit scoring rule.</p></div></div>
+  <div class="page-heading"><div><span class="eyebrow">Explainable discovery</span><h1>Match explorer</h1><p id="matchingDesc">Compare potential sponsors using clear and explainable matching criteria.</p></div></div>
   <div class="panel" style="margin-bottom:20px"><div class="field-grid">
-   <div><label for="matchClub">Select a club</label><select id="matchClub"></select></div>
+   <div><label for="matchClub" id="matchLabel">Select a club</label><select id="matchClub"></select></div>
    <div><label for="minimumScore">Minimum compatibility</label><select id="minimumScore"><option value="0">All matches</option><option value="60">60% or more</option><option value="80">80% or more</option></select></div></div>
    <p class="help">This score is a transparent heuristic: 40 base + 25 shared interest + 20 same location + up to 15 for compatible funding. It does not predict partnership success and is not a trained AI model.</p>
   </div><div class="grid" id="matchingGrid"></div>
  </section>
  <section id="proposals" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Sponsorship pipeline</span><h1>Proposals</h1><p>Create a draft, submit it and track authorised responses.</p></div><button class="btn" id="addProposal" type="button">+ New proposal</button></div>
+  <div class="page-heading"><div><span class="eyebrow">Sponsorship pipeline</span><h1>Proposals</h1><p id="proposalDesc">Review sponsorship proposals sent to your club.</p></div><button class="btn" id="addProposal" type="button">+ New proposal</button></div>
   <div class="notice" id="proposalNotice"></div><div class="panel" id="proposalList"></div>
  </section>
  <section id="profile" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Organisation profile</span><h1>My organisation</h1><p>Manage the information that represents your community or business.</p></div></div>
+  <div class="page-heading"><div><span class="eyebrow">Organisation profile</span><h1>My organisation</h1><p id="profileDesc">Manage your club profile and funding requirements.</p></div></div>
   <div class="split"><div class="panel" id="myOrg"></div><div class="panel"><h3>Verification and trust</h3><p>New organisations begin as <b>Pending</b>. Only an administrator can approve them for public discovery and live proposal submission.</p><p>Approval is not a guarantee of sponsorship quality or funding. Protect personal details and verify offers independently.</p><button class="btn outline" id="profileAddOrg">Create organisation</button></div></div>
  </section>
  <section id="verification" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Administrator control</span><h1>Organisation verification</h1><p>Review new accounts and record approval decisions.</p></div></div>
+  <div class="page-heading"><div><span class="eyebrow">Administrator control</span><h1>Organisation verification</h1><p>Review club and sponsor applications, check verification details and record decisions.</p></div></div>
   <div class="notice warning"><strong>Restricted role</strong><p>Real administrator privileges are assigned manually in the database, never through public sign-up. In demo mode, this screen is only a simulation.</p></div>
   <div class="panel" id="verificationList"></div>
  </section>
- <section id="studio" class="view">
-  <div class="page-heading"><div><span class="eyebrow">Creative workspace</span><h1>Campaign studio</h1><p>Draft a clear sponsorship campaign brief using a structured local template.</p></div></div>
-  <div class="notice"><strong>Transparent creative tool</strong><p>This tool builds text from your inputs. It does not contact a live AI model, generate images or publish marketing campaigns.</p></div>
-  <div class="split">
-   <div class="panel"><h3>Campaign details</h3>
-    <label for="campaignTitle">Campaign or event title</label><input id="campaignTitle" maxlength="120" placeholder="Community Sports Day 2027">
-    <label for="campaignCommunity">Club or community organisation</label><input id="campaignCommunity" maxlength="120" placeholder="Sheffield Youth FC">
-    <label for="campaignBrand">Business sponsor</label><input id="campaignBrand" maxlength="120" placeholder="Local Partner Ltd">
-    <label for="campaignGoal">Campaign goal</label><select id="campaignGoal"><option>Raise community awareness</option><option>Increase event attendance</option><option>Promote sponsor impact</option><option>Support grassroots fundraising</option></select>
-    <label for="campaignContext">Additional context</label><textarea id="campaignContext" maxlength="1000" placeholder="Who benefits? What happens at the event?"></textarea>
-    <div class="modal-actions"><button class="btn" id="campaignGenerate" type="button">Generate brief</button></div>
-   </div>
-   <div class="panel"><h3>Campaign brief preview</h3><div id="campaignOutput" style="white-space:pre-wrap;color:#365846;font-size:13px;min-height:240px">Your campaign brief will appear here.</div>
-    <div class="modal-actions"><button class="btn outline" id="campaignCopy" type="button">Copy brief</button><button class="btn outline" id="campaignDownload" type="button">Download .txt</button></div>
-   </div>
-  </div>
- </section>
  <section id="help" class="view">
-  <div class="page-heading"><div><span class="eyebrow">About the platform</span><h1>Purpose, privacy &amp; limitations</h1><p>A transparent student-built approach to community sponsorship.</p></div></div>
+  <div class="page-heading"><div><span class="eyebrow">How access works</span><h1>Who can access what?</h1><p>Three clearly separated workspaces with role-based permissions.</p></div></div>
+  <div class="grid role-access"><div class="card"><div class="round-icon">🏟️</div><h3>Club / VCSE</h3><p>Manage club profile, browse sponsors, compare matching opportunities and accept or decline proposals received.</p></div><div class="card"><div class="round-icon">🏢</div><h3>Business sponsor</h3><p>Manage business profile, browse community clubs, find suitable causes, create and submit sponsorship proposals.</p></div><div class="card"><div class="round-icon">🛡️</div><h3>Administrator</h3><p>Review organisation approvals, oversee listed organisations and monitor proposals. Admin role is granted by the database owner.</p></div></div>
   <div class="grid">
    <div class="card"><div class="round-icon">🔎</div><h3>Explainable matching</h3><p>Scores are based on location, interests and budget. They are illustrative, not predictions or trained AI results.</p></div>
    <div class="card"><div class="round-icon">🔒</div><h3>Security by design</h3><p>Connected accounts use Supabase authentication and database row-level security. Demo roles are simulated.</p></div>
