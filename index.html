@@ -21,6 +21,7 @@
   <button class="nav" data-page="proposals"><i aria-hidden="true">▤</i> Proposals</button>
   <button class="nav" data-page="profile"><i aria-hidden="true">♙</i> My organisation</button>
   <button class="nav" data-page="verification" id="adminNav" hidden><i aria-hidden="true">✓</i> Verification</button>
+  <button class="nav" data-page="studio"><i aria-hidden="true">✦</i> Campaign studio</button>
   <button class="nav" data-page="help"><i aria-hidden="true">ⓘ</i> About &amp; privacy</button>
  </nav>
  <div class="sidebar-foot"><b>Better connections. Stronger communities.</b>Discover compatible causes, send meaningful proposals and track progress in one place.</div>
@@ -72,6 +73,23 @@
   <div class="page-heading"><div><span class="eyebrow">Administrator control</span><h1>Organisation verification</h1><p>Review new accounts and record approval decisions.</p></div></div>
   <div class="notice warning"><strong>Restricted role</strong><p>Real administrator privileges are assigned manually in the database, never through public sign-up. In demo mode, this screen is only a simulation.</p></div>
   <div class="panel" id="verificationList"></div>
+ </section>
+ <section id="studio" class="view">
+  <div class="page-heading"><div><span class="eyebrow">Creative workspace</span><h1>Campaign studio</h1><p>Draft a clear sponsorship campaign brief using a structured local template.</p></div></div>
+  <div class="notice"><strong>Transparent creative tool</strong><p>This tool builds text from your inputs. It does not contact a live AI model, generate images or publish marketing campaigns.</p></div>
+  <div class="split">
+   <div class="panel"><h3>Campaign details</h3>
+    <label for="campaignTitle">Campaign or event title</label><input id="campaignTitle" maxlength="120" placeholder="Community Sports Day 2027">
+    <label for="campaignCommunity">Club or community organisation</label><input id="campaignCommunity" maxlength="120" placeholder="Sheffield Youth FC">
+    <label for="campaignBrand">Business sponsor</label><input id="campaignBrand" maxlength="120" placeholder="Local Partner Ltd">
+    <label for="campaignGoal">Campaign goal</label><select id="campaignGoal"><option>Raise community awareness</option><option>Increase event attendance</option><option>Promote sponsor impact</option><option>Support grassroots fundraising</option></select>
+    <label for="campaignContext">Additional context</label><textarea id="campaignContext" maxlength="1000" placeholder="Who benefits? What happens at the event?"></textarea>
+    <div class="modal-actions"><button class="btn" id="campaignGenerate" type="button">Generate brief</button></div>
+   </div>
+   <div class="panel"><h3>Campaign brief preview</h3><div id="campaignOutput" style="white-space:pre-wrap;color:#365846;font-size:13px;min-height:240px">Your campaign brief will appear here.</div>
+    <div class="modal-actions"><button class="btn outline" id="campaignCopy" type="button">Copy brief</button><button class="btn outline" id="campaignDownload" type="button">Download .txt</button></div>
+   </div>
+  </div>
  </section>
  <section id="help" class="view">
   <div class="page-heading"><div><span class="eyebrow">About the platform</span><h1>Purpose, privacy &amp; limitations</h1><p>A transparent student-built approach to community sponsorship.</p></div></div>
