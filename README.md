@@ -13,9 +13,21 @@ SponsorMatch is a Sheffield Hallam University prototype designed to help clubs/V
 - Organisation registration and administrator approval workflow.
 - Optional real account sign-in and shared PostgreSQL database using **Supabase Auth + Row Level Security**.
 - Keyboard-accessible native dialogs, form validation, labelled navigation and reduced-motion support.
-- Demo data reset/export and an obvious Demo Mode indicator.
+- Demo data reset/export and a compact role selector for reviewing access.
 - Browser smoke tests under \`tests/\`, runnable with GitHub Actions.
 - Original V3 demo retained at [legacy.html](legacy.html).
+
+## Role-based website access
+
+| Role | Navigation and access |
+| --- | --- |
+| **Club / VCSE** | Club dashboard; directory of **business sponsors**; club-to-sponsor matching; **incoming proposals** (accept or reject submitted offers); own club profile; About & access. Cannot submit sponsorship offers, verify organisations, or access Admin controls. |
+| **Business Sponsor** | Sponsor dashboard; directory of **clubs**; sponsor-to-club matching; **outgoing proposals** (create draft and submit); own business profile; About & access. Cannot accept offers on behalf of clubs or verify organisations. |
+| **Admin** | Platform dashboard; full organisation directory including pending registrations; proposal oversight; **organisation verification** (approve or reject); About & access. Does not act as a sponsor or club. |
+
+The public role selector switches **demo views only**. When Supabase is configured and a user signs in, account role and permissions come from the database instead; the role selector is hidden.
+
+The large demo banner, unconfigured backend prompt, Visitor option and Campaign Studio have been removed from the primary interface. The older V3 is still available under `legacy.html` for reference.
 
 ## Important: demo vs connected mode
 
