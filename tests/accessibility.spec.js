@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 for(const section of ['dashboard','directory','matching','proposals','help']){
   test('WCAG AA audit: '+section,async({page})=>{
-    await page.goto('/');
+    await page.goto('/home.html');
     if(section!=='dashboard')await page.locator('#nav [data-page="'+section+'"]').click();
     const results=await new AxeBuilder({page})
       .withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa'])
