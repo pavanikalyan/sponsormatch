@@ -28,7 +28,7 @@ const sponsors=()=>st.db.orgs.filter(o=>o.kind==='sponsor'&&(approved(o)||own(o)
 const safeNum=x=>Number.isFinite(Number(x))?Number(x):0;
 function toast(text,bad=false){const el=$('toast');el.textContent=text;el.style.background=bad?'#9d3e37':'#184b33';el.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>el.classList.remove('show'),4500)}
 function saveDemo(){if(!isLive())try{localStorage.setItem('sponsormatch-demo-v4',JSON.stringify(st.db))}catch{toast('Browser storage unavailable',true)}}
-function nav(page){if(!$(page))return;st.page=page;$$('.view').forEach(v=>v.classList.toggle('active',v.id===page));$$('#nav .nav').forEach(b=>{const active=b.dataset.page===page;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')});$('breadcrumb').textContent=({dashboard:'Dashboard',directory:'Organisations',matching:'Match explorer',proposals:'Proposals',profile:'My organisation',verification:'Verification',help:'About & privacy'})[page]||page;history.replaceState(null,'','#'+page);closeMenu();renderPage();window.scrollTo({top:0,behavior:'smooth'})}
+function nav(page){if(!$(page))return;st.page=page;$$('.view').forEach(v=>v.classList.toggle('active',v.id===page));$$('#nav .nav').forEach(b=>{const active=b.dataset.page===page;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')});$('breadcrumb').textContent=({dashboard:'Dashboard',directory:'Organisations',matching:'Match explorer',proposals:'Proposals',profile:'My organisation',verification:'Verification',studio:'Campaign studio',help:'About & privacy'})[page]||page;history.replaceState(null,'','#'+page);closeMenu();renderPage();window.scrollTo({top:0,behavior:'smooth'})}
 function closeMenu(){$('sidebar').classList.remove('open');$('backdrop').classList.remove('show');$('menu').setAttribute('aria-expanded','false')}
 $('menu').addEventListener('click',()=>{const open=$('sidebar').classList.toggle('open');$('backdrop').classList.toggle('show',open);$('menu').setAttribute('aria-expanded',String(open))});
 $('backdrop').addEventListener('click',()=>{closeMenu();$('menu').focus()});
@@ -125,8 +125,46 @@ catch(err){toast(err.message||'Verification failed',true)}});
 $('exportDemo').addEventListener('click',()=>{if(isLive()){toast('Export is only available for local demo data',true);return}
 const blob=new Blob([JSON.stringify({format:'sponsormatch-demo-v4',exportedAt:new Date().toISOString(),data:st.db},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='sponsormatch-demo.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Demo records exported')});
 $('resetDemo').addEventListener('click',()=>{if(isLive())return;if(!confirm('Reset this device to the fictional sample records?'))return;st.db=clone(seed);saveDemo();render();toast('Demo reset')});
+
+let lastCampaignBrief='';
+$('campaignGenerate').addEventListener('click',()=>{
+ const title=$('campaignTitle').value.trim(),club=$('campaignCommunity').value.trim(),sponsor=$('campaignBrand').value.trim(),context=$('campaignContext').value.trim();
+ if([title,club,sponsor].some(v=>v.length<2)){toast('Add the campaign, community and sponsor names to generate a brief.',true);return}
+ const goal=$('campaignGoal').value;
+ lastCampaignBrief=[
+ 'CAMPAIGN BRIEF — '+title,
+ '',
+ 'COMMUNITY PARTNER: '+club,
+ 'BUSINESS SPONSOR: '+sponsor,
+ 'PRIMARY GOAL: '+goal,
+ '',
+ 'CONCEPT',
+ 'Celebrate the partnership between '+club+' and '+sponsor+' by highlighting genuine local community value.',
+ '',
+ 'RECOMMENDED CONTENT',
+ '1. Share a joint partnership announcement with both organisations.',
+ '2. Show the community need and explain the contribution without exaggerated claims.',
+ '3. Capture authentic photos or videos only with appropriate consent.',
+ '4. Publish follow-up updates with measured outcomes.',
+ '',
+ 'SUCCESS METRICS',
+ 'Track relevant participation, event attendance, community engagement and sponsor visibility.',
+ '',
+ 'ADDITIONAL CONTEXT',
+ context||'No additional context provided.',
+ '',
+ 'REVIEW CHECKLIST',
+ 'Confirm sponsor permission, privacy and photography consent; verify every factual claim before publication.'
+ ].join('\n');
+ $('campaignOutput').textContent=lastCampaignBrief;toast('Campaign brief created locally');
+});
+$('campaignCopy').addEventListener('click',async()=>{if(!lastCampaignBrief){toast('Generate a brief first',true);return}
+try{await navigator.clipboard.writeText(lastCampaignBrief);toast('Brief copied')}
+catch{toast('Clipboard unavailable. Select and copy the preview text.',true)}});
+$('campaignDownload').addEventListener('click',()=>{if(!lastCampaignBrief){toast('Generate a brief first',true);return}
+const url=URL.createObjectURL(new Blob([lastCampaignBrief],{type:'text/plain'})),a=document.createElement('a');a.href=url;a.download='sponsormatch-campaign-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Campaign brief downloaded')});
 async function init(){if(api){api.auth.onAuthStateChange(()=>setTimeout(refresh,0));await refresh()}else{st.mode='demo';render()}
-const hash=location.hash.slice(1);nav(['dashboard','directory','matching','proposals','profile','verification','help'].includes(hash)?hash:'dashboard');
+const hash=location.hash.slice(1);nav(['dashboard','directory','matching','proposals','profile','verification','studio','help'].includes(hash)?hash:'dashboard');
 if(!api){$('authOpen').title='Configure Supabase using README.md to enable secure accounts'}}
 init();
 })();
