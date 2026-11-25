@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 
 test.beforeEach(async({page})=>{
- await page.goto('/');
+ await page.goto('/home.html');
  await expect(page.locator('#dashboard')).toBeVisible();
 });
 
@@ -97,7 +97,7 @@ test('data reset restores sample records',async({page})=>{
 });
 
 test('direct URL hash does not reveal admin-only screen to Club',async({page})=>{
- await page.goto('/#verification');
+ await page.goto('/home.html#verification');
  await expect(page.locator('#dashboard')).toBeVisible();
  await expect(page.locator('#verification')).toBeHidden();
 });
@@ -127,10 +127,19 @@ test('Register opens separate Club and Sponsor registration page',async({page})=
  await expect(page).toHaveURL(/\/login\.html$/);
 });
 test('post-auth URLs show appropriate home notifications and clear query flags',async({page})=>{
- await page.goto('/?auth=registered');
+ await page.goto('/home.html?auth=registered');
  await expect(page.locator('#toast')).toContainText('Check your email');
- await expect(page).toHaveURL(/\/#dashboard$/);
- await page.goto('/?auth=login');
+ await expect(page).toHaveURL(/\/home\.html#dashboard$/);
+ await page.goto('/home.html?auth=login');
  await expect(page.locator('#toast')).toContainText('Logged in successfully');
- await expect(page).toHaveURL(/\/#dashboard$/);
+ await expect(page).toHaveURL(/\/home\.html#dashboard$/);
+});
+
+test('main project URL opens registration first',async({page})=>{
+ await page.goto('/');
+ await expect(page).toHaveURL(/\/register\.html$/);
+ await expect(page.getByRole('heading',{name:'Create your account'})).toBeVisible();
+ await page.getByRole('link',{name:'Explore the sample dashboard without an account'}).click();
+ await expect(page).toHaveURL(/\/home\.html#dashboard$/);
+ await expect(page.locator('#dashboard')).toBeVisible();
 });
