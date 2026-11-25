@@ -1,8 +1,14 @@
 {
- "name":"sponsormatch-ai",
- "private":true,
- "version":"4.0.0",
- "description":"Accessible community sponsorship platform — static demo with optional Supabase backend",
- "scripts":{"test":"playwright test","test:syntax":"node --check platform.js && node --check supabase-config.js"},
- "devDependencies":{"@playwright/test":"^1.56.0"}
+  "name": "sponsormatch-ai",
+  "private": true,
+  "version": "4.0.0",
+  "description": "Accessible community sponsorship platform — static demo with optional Supabase backend",
+  "scripts": {
+    "test": "playwright test",
+    "test:syntax": "node --check platform.js && node --check supabase-config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@axe-core/playwright": "^4.10.2"
+  }
 }
