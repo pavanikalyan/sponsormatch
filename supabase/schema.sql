@@ -18,6 +18,15 @@ as $$ select exists(select 1 from public.admin_users where user_id=(select auth.
 revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to authenticated;
 
+create or replace function public.owns_org(org_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $ select exists(select 1 from public.organizations where id=org_id and owner_id=(select auth.uid())); $;
+create or replace function public.is_org_approved(org_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $ select exists(select 1 from public.org_verifications where org_id=owns_org.org_id and status='approved'); $;
+revoke all on function public.owns_org(uuid),public.is_org_approved(uuid) from public;
+grant execute on function public.owns_org(uuid),public.is_org_approved(uuid) to authenticated;
+
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path=''
 as $$
@@ -171,7 +180,7 @@ create policy profiles_edit on public.profiles for update to authenticated
 
 create policy org_read on public.organizations for select to authenticated
  using(owner_id=(select auth.uid()) or public.is_admin() or
- exists(select 1 from public.org_verifications v where v.org_id=id and v.status='approved'));
+ public.is_org_approved(id));
 create policy org_insert on public.organizations for insert to authenticated
  with check(owner_id=(select auth.uid()) and exists(
   select 1 from public.profiles p where p.id=(select auth.uid()) and p.role=kind));
@@ -179,8 +188,7 @@ create policy org_edit on public.organizations for update to authenticated
  using(owner_id=(select auth.uid())) with check(owner_id=(select auth.uid()));
 
 create policy verify_read on public.org_verifications for select to authenticated
- using(public.is_admin() or status='approved' or exists(
-  select 1 from public.organizations o where o.id=org_id and o.owner_id=(select auth.uid())));
+ using(public.is_admin() or status='approved' or public.owns_org(org_id));
 create policy verify_admin_update on public.org_verifications for update to authenticated
  using(public.is_admin()) with check(public.is_admin());
 
@@ -191,15 +199,12 @@ create policy proposal_insert on public.proposals for insert to authenticated
  with check(sender_id=(select auth.uid()) and exists(
   select 1 from public.organizations o where o.id=sponsor_org_id and o.owner_id=(select auth.uid()) and o.kind='sponsor'));
 create policy proposal_update on public.proposals for update to authenticated
- using(sender_id=(select auth.uid()) or exists(
-  select 1 from public.organizations o where o.id=club_org_id and o.owner_id=(select auth.uid())))
- with check(sender_id=(select auth.uid()) or exists(
-  select 1 from public.organizations o where o.id=club_org_id and o.owner_id=(select auth.uid())));
+ using(sender_id=(select auth.uid()) or public.owns_org(club_org_id))
+ with check(sender_id=(select auth.uid()) or public.owns_org(club_org_id));
 
 create policy events_read on public.proposal_events for select to authenticated using(
  public.is_admin() or exists(select 1 from public.proposals p where p.id=proposal_id and
- (p.sender_id=(select auth.uid()) or exists(
-  select 1 from public.organizations o where o.id=p.club_org_id and o.owner_id=(select auth.uid())))));
+ (p.sender_id=(select auth.uid()) or public.owns_org(p.club_org_id))));
 
 -- Explicit least-privilege grants. Column grants protect immutable owner/kind fields.
 revoke all on public.profiles, public.admin_users, public.organizations,
