@@ -80,7 +80,7 @@ function renderDashboard(){
  role==='sponsor'?clubs().filter(approved).slice(0,3).map(orgCard):
  sponsors().filter(approved).slice(0,3).map(orgCard);
  $('featured').innerHTML=listed.length?listed.join(''):'<div class="empty">No matching organisations here yet.</div>';
- const goButton=$('#dashboard .section-head .btn[data-goto]');
+ const goButton=document.querySelector('#dashboard .section-head .btn[data-goto]');
  if(goButton){goButton.dataset.goto=role==='admin'?'verification':role==='club'?'directory':'matching';
  goButton.textContent=role==='admin'?'Review applications':role==='club'?'Browse sponsors':'Explore club matches'}
 }
