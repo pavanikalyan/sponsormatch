@@ -18,15 +18,6 @@ as $$ select exists(select 1 from public.admin_users where user_id=(select auth.
 revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to authenticated;
 
-create or replace function public.owns_org(org_id uuid)
-returns boolean language sql stable security definer set search_path=''
-as $ select exists(select 1 from public.organizations where id=org_id and owner_id=(select auth.uid())); $;
-create or replace function public.is_org_approved(org_id uuid)
-returns boolean language sql stable security definer set search_path=''
-as $ select exists(select 1 from public.org_verifications where org_id=owns_org.org_id and status='approved'); $;
-revoke all on function public.owns_org(uuid),public.is_org_approved(uuid) from public;
-grant execute on function public.owns_org(uuid),public.is_org_approved(uuid) to authenticated;
-
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path=''
 as $$
@@ -163,6 +154,15 @@ end; $$;
 drop trigger if exists validate_verification_changes on public.org_verifications;
 create trigger validate_verification_changes before update on public.org_verifications
 for each row execute function public.validate_verification();
+
+create or replace function public.owns_org(_org_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $ select exists(select 1 from public.organizations where id=_org_id and owner_id=(select auth.uid())); $;
+create or replace function public.is_org_approved(_org_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $ select exists(select 1 from public.org_verifications where org_id=_org_id and status='approved'); $;
+revoke all on function public.owns_org(uuid),public.is_org_approved(uuid) from public;
+grant execute on function public.owns_org(uuid),public.is_org_approved(uuid) to authenticated;
 
 -- RLS is enforced in the database. Do not disable for application use.
 alter table public.profiles enable row level security;
