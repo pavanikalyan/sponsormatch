@@ -18,7 +18,7 @@ if(!client){
  notice.hidden=true;
  // A signed-in user should not need to sign in again.
  client.auth.getSession().then(({data})=>{
-  if(data?.session?.user)location.replace('./');
+  if(data?.session?.user)location.replace('home.html');
  }).catch(()=>{});
 }
 form.addEventListener('submit',async event=>{
@@ -39,7 +39,7 @@ form.addEventListener('submit',async event=>{
  setBusy(true);
  try{
   if(register){
-   const redirect=new URL('./?auth=confirmed',location.href).href;
+   const redirect=new URL('home.html?auth=confirmed',location.href).href;
    const {data,error}=await client.auth.signUp({
      email,password,
      options:{emailRedirectTo:redirect,data:{role:fields.role,display_name:String(fields.displayName||'').trim()}}
@@ -47,12 +47,12 @@ form.addEventListener('submit',async event=>{
    if(error)throw error;
    if(!data?.user)throw new Error('Registration did not complete. Please retry.');
    // If email confirmation is on, user is not authenticated yet; explain that on the home page.
-   location.assign(data.session?'./?auth=login':'./?auth=registered');
+   location.assign(data.session?'home.html?auth=login':'home.html?auth=registered');
   } else {
    const {data,error}=await client.auth.signInWithPassword({email,password});
    if(error)throw error;
    if(!data?.session)throw new Error('Login did not return a valid session.');
-   location.assign('./?auth=login');
+   location.assign('home.html?auth=login');
   }
  }catch(error){showError(error?.message||'Unable to continue.');setBusy(false)}
 });
