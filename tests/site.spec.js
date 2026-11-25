@@ -129,8 +129,8 @@ test('Register opens separate Club and Sponsor registration page',async({page})=
 test('post-auth URLs show appropriate home notifications and clear query flags',async({page})=>{
  await page.goto('/?auth=registered');
  await expect(page.locator('#toast')).toContainText('Check your email');
- await expect(page).toHaveURL(/\/$/);
+ await expect(page).toHaveURL(/\/#dashboard$/);
  await page.goto('/?auth=login');
  await expect(page.locator('#toast')).toContainText('Logged in successfully');
- await expect(page).toHaveURL(/\/$/);
+ await expect(page).toHaveURL(/\/#dashboard$/);
 });
