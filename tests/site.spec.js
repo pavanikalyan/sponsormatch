@@ -108,7 +108,7 @@ test('Log in opens a dedicated page with safe backend notice',async({page})=>{
  await expect(page).toHaveURL(/\/login\.html$/);
  await expect(page.getByRole('heading',{name:'Log in to SponsorMatch'})).toBeVisible();
  await expect(page.locator('#backendMessage')).toBeVisible();
- await expect(page.locator('#email')).toBeDisabled();
+ await expect(page.locator('#email')).toBeEnabled();
  await expect(page.locator('#password')).toBeDisabled();
  await expect(page.locator('#authPageSubmit')).toBeDisabled();
  await page.getByRole('link',{name:'Back to home'}).click();
@@ -123,6 +123,14 @@ test('Register opens separate Club and Sponsor registration page',async({page})=
  await expect(page.locator('#accountRole option[value="sponsor"]')).toHaveCount(1);
  await expect(page.locator('#accountRole option[value="admin"]')).toHaveCount(0);
  await expect(page.locator('#backendMessage')).toBeVisible();
+ await expect(page.locator('#displayName')).toBeEnabled();
+ await page.locator('#displayName').fill('Test Club Owner');
+ await expect(page.locator('#displayName')).toHaveValue('Test Club Owner');
+ await expect(page.locator('#accountRole')).toBeEnabled();
+ await expect(page.locator('#email')).toBeEnabled();
+ await expect(page.locator('#password')).toBeDisabled();
+ await expect(page.locator('#confirmPassword')).toBeDisabled();
+ await expect(page.locator('#authPageSubmit')).toBeDisabled();
  await page.getByRole('link',{name:'Log in'}).last().click();
  await expect(page).toHaveURL(/\/login\.html$/);
 });
