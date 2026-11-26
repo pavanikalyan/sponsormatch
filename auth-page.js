@@ -13,7 +13,8 @@ const showError=message=>{errorNode.textContent=message||'Something went wrong. 
 const setBusy=busy=>{submit.disabled=busy;submit.setAttribute('aria-busy',String(busy));submit.innerHTML=busy?'Please wait…':(register?'Create account <span aria-hidden="true">→</span>':'Log in <span aria-hidden="true">→</span>')};
 if(!client){
  notice.hidden=false;
- form.querySelectorAll('input,select,button[type="submit"]').forEach(el=>{el.disabled=true});
+ // Permit a harmless form preview; never accept passwords or submit data without an authenticated backend.
+ form.querySelectorAll('input[type="password"],button[type="submit"]').forEach(el=>{el.disabled=true});
 } else {
  notice.hidden=true;
  // A signed-in user should not need to sign in again.
